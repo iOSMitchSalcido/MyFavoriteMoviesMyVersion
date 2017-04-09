@@ -45,15 +45,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-    
-    func thumbnailPosterPathString() -> String? {
-        
-        if let config = config, let images = config["images"] as? [String: AnyObject], let secureBaseURL = images["secure_base_url"] as? String, let sizes = images["poster_sizes"] as? [String] {
-            
-            return secureBaseURL + sizes[1]
-        }
-        
-        return nil
-    }
 }
 
