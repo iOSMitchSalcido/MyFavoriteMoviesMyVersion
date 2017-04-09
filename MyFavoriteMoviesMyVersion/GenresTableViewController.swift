@@ -128,8 +128,13 @@ extension GenresTableViewController {
                 return nil
             }
             
-            // invoke api call
-            api.moviesByGenreID(id, completion: completion)
+            // invoke api call..test for favorites
+            if indexPath.row == 0 {
+                api.favoriteMovies(completion: completion)
+            }
+            else {
+                api.moviesByGenreID(id, completion: completion)
+            }
         }
     }
 }

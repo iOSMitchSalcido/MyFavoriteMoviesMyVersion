@@ -5,6 +5,10 @@
 //  Created by Online Training on 4/8/17.
 //  Copyright © 2017 Mitch Salcido. All rights reserved.
 //
+/*
+ About MoviesTableViewController.swift:
+ TVC to present a list of movies.
+*/
 
 import UIKit
 
@@ -26,8 +30,8 @@ class MoviesTableViewController: UITableViewController {
         appDelegate = UIApplication.shared.delegate as! AppDelegate
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
         // reload
         tableView.reloadData()
@@ -38,6 +42,7 @@ class MoviesTableViewController: UITableViewController {
         
         if let config = appDelegate.config, let images = config["images"] as? [String: AnyObject], let secureBaseURL = images["secure_base_url"] as? String, let sizes = images["poster_sizes"] as? [String] {
 
+            // return size based on number of available sizes
             switch sizes.count {
             case 0:
                 return nil
@@ -51,6 +56,7 @@ class MoviesTableViewController: UITableViewController {
     }
 }
 
+// tv data source functions
 extension MoviesTableViewController {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -61,30 +67,41 @@ extension MoviesTableViewController {
         return movies.count
     }
     
-     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-     let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCellID", for: indexPath)
-     
-     // Configure the cell...
-     let movie = movies[indexPath.row]
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCellID", for: indexPath)
+        
+        // Configure the cell...
+        let movie = movies[indexPath.row]
         if let title = movie["title"] as? String {
+            // populate cell text with movie title
             cell.textLabel?.text = title
         }
+        else {
+            cell.textLabel?.text = "?Unknown?"
+        }
+        
+        // retrieve poster_path from movie
         if let posterPath = movie["poster_path"] as? String {
             
+            // posterPath is used as key for cell image buffer...test for image
             if let image = thumbnailImageBuffer[posterPath] {
+                // image is in buffer...set cell imageView
                 cell.imageView?.image = image
             }
             else {
                 
+                // image doesn't exist in buffer...retrieve image
                 if let url = thumbnailURLForPosterPath(string: posterPath) {
                     
                     let request = URLRequest(url: url)
                     let task = URLSession.shared.dataTask(with: request) {
                         (data, response, error) in
                         
+                        // get image...set in buffer
                         if let imageData = data, let image = UIImage(data: imageData) {
                             self.thumbnailImageBuffer[posterPath] = image
                             
+                            // reload row
                             DispatchQueue.main.async {
                                 self.tableView.reloadRows(at: [indexPath], with: .automatic)
                             }
@@ -95,12 +112,18 @@ extension MoviesTableViewController {
             }
         }
         
-     return cell
-     }
+        return cell
+    }
 }
 
+// tv delegate functions
 extension MoviesTableViewController {
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {        
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let movie = movies[indexPath.row]
+        let controller = storyboard?.instantiateViewController(withIdentifier: "MovieViewController") as! MovieViewController
+        controller.movie = movie
+        navigationController?.pushViewController(controller, animated: true)
     }
 }

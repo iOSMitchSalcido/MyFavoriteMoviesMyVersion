@@ -156,6 +156,26 @@ extension TMDBApi {
         tmdbTask(params: params as [String : AnyObject], completions: [completion])
     }
     
+    func favoriteMovies(completion: @escaping ([String: AnyObject]?, Errors?) -> [String: AnyObject]?) {
+        
+        // save token in appDelegate singleton
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        // test for valid sessionID and userID
+        if let sessionID = appDelegate.sessionID, let userID = appDelegate.userID {
+         
+            // good ID's...proceed
+            let params = [TMDBParameterKeys.api: TMDBParameterValues.api,
+                          TMDBParameterKeys.sessionID: sessionID,
+                          "pathExtensions": "/account/\(userID)/favorite/movies"]
+            
+            tmdbTask(params: params as [String : AnyObject], completions: [completion])
+        }
+        else {
+            // bad ID's fire completion with error message
+            let _ = completion(nil, Errors.networkingError("Not currently log'd in to TMDB"))
+        }
+    }
 }
 
 extension TMDBApi {

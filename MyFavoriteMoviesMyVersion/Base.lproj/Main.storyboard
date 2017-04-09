@@ -186,12 +186,54 @@
                     <view key="view" contentMode="scaleToFill" id="pv1-c2-L4U">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="bAd-oR-fD0">
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="CuF-Ad-F5E">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="80"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="BGDK K OKMy Movie Title TTTTTTT" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IYG-GS-APB">
+                                                <rect key="frame" x="0.0" y="0.0" width="375" height="80"/>
+                                                <color key="backgroundColor" red="0.50196081400000003" green="1" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="80" id="z5p-KO-FhS"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" name="PartyLetPlain" family="Party LET" pointSize="23"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="dCu-Ho-0c2">
+                                        <rect key="frame" x="0.0" y="80" width="375" height="523"/>
+                                        <subviews>
+                                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gUK-5m-zeJ">
+                                                <rect key="frame" x="0.0" y="0.0" width="375" height="523"/>
+                                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                            </imageView>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                            </stackView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="2jq-lx-7JZ" firstAttribute="top" secondItem="bAd-oR-fD0" secondAttribute="bottom" id="EWP-bO-1DQ"/>
+                            <constraint firstItem="bAd-oR-fD0" firstAttribute="leading" secondItem="pv1-c2-L4U" secondAttribute="leading" id="Wrq-Xn-uWw"/>
+                            <constraint firstAttribute="trailing" secondItem="bAd-oR-fD0" secondAttribute="trailing" id="sl2-EM-Jin"/>
+                            <constraint firstItem="bAd-oR-fD0" firstAttribute="top" secondItem="I47-YX-lY7" secondAttribute="bottom" id="vzP-yG-XB2"/>
+                        </constraints>
                     </view>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <connections>
+                        <outlet property="imageView" destination="gUK-5m-zeJ" id="7pk-cw-Jno"/>
+                        <outlet property="titleLabel" destination="IYG-GS-APB" id="ysm-83-NGR"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ylM-2d-y1y" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2919" y="-379"/>
+            <point key="canvasLocation" x="2929" y="-379"/>
         </scene>
     </scenes>
 </document>
