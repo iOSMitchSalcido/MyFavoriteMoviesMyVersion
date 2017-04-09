@@ -17,14 +17,18 @@ struct TMDBApi {
     }
 }
 
+// login
 extension TMDBApi {
     
+    // login to TMDB
     func loginWithUserName(_ userName: String, password: String, completion: @escaping ([String: AnyObject]?, Errors?) -> [String: AnyObject]?) {
         
-        // 1. get token: /authentication/token/new
-        // 2. validate token: /authentication/token/validate_with_login
-        // 3. generate sessionID: /authentication/session/new
-        // 4. retrieve userID: /account
+        /*
+        1. get token: /authentication/token/new
+        2. validate token: /authentication/token/validate_with_login
+        3. generate sessionID: /authentication/session/new
+        4. retrieve userID: /account
+        */
         
         let validateTokenCompletion = {(params: [String: AnyObject]?, error: Errors?) -> [String: AnyObject]? in
             
@@ -89,13 +93,51 @@ extension TMDBApi {
 }
 
 extension TMDBApi {
+    
+    func movieGenres(completion: @escaping ([String: AnyObject]?, Errors?) -> [String: AnyObject]?) {
+        
+        let params = [TMDBParameterKeys.api: TMDBParameterValues.api,
+                      "pathExtensions": "/genre/movie/list"]
+        tmdbTask(params: params as [String : AnyObject], completions: [completion])
+    }
+    
+    func moviesByGenreID(_ id: Int, completion: @escaping ([String: AnyObject]?, Errors?) -> [String: AnyObject]?) {
+        
+        let params = [TMDBParameterKeys.api: TMDBParameterValues.api,
+                      "pathExtensions": "/genre/\(id)/list"]
+        tmdbTask(params: params as [String : AnyObject], completions: [completion])
+    }
+    
+}
 
+extension TMDBApi {
+
+    // run a session data task
     fileprivate func tmdbTask(params: [String: AnyObject], completions: [([String: AnyObject]?, Errors?) -> [String: AnyObject]?]) {
 
+        /*
+         This function creates and runs a data task. Function takes params and sifts out key/values to create a 
+         valid URL. Within params, keys "pathExtensions" and requestBody can be included. pathExtensions are needed
+         to append path in url creation. requestBody is required for creating post methods to API
+         
+         completions are an array of completion blocks of the form:
+         ([String: AnyObject]?, Errors?) -> [String: AnyObject]?
+         
+         Block at index 0 is intended as a block to exectue upon successful finish of all blocks above. Use
+         block at 0 for UI update, etc.
+         
+         Each block in array is intended to be passed the recovered JSON data, and return a dictionary
+         for use as a params in a new tmdbTask call. The last completion in array is removed and then executed
+        */
+        
+        // create params, pull out pathExtensions and request body
         var newParams = params
         let pathExtensions = newParams.removeValue(forKey: "pathExtensions") as? String
+        let requestBody = newParams.removeValue(forKey: TMDBParameterKeys.requestBody)
+        
+        // create URLRequest. Test if body present
         var request = URLRequest(url: urlFromParams(params, pathExtentions: pathExtensions))
-        if let requestBody = newParams.removeValue(forKey: TMDBParameterKeys.requestBody) {
+        if let requestBody = requestBody {
             request.httpMethod = "POST"
             print(requestBody)
         }
@@ -103,25 +145,30 @@ extension TMDBApi {
             request.httpMethod = "GET"
         }
         
+        // create task
         let task = URLSession.shared.dataTask(with: request) {
             (data, response, error) in
             
+            // error check
             guard error == nil else {
-                let _ = completions.first!(nil, Errors.networkingError("Error returned"))
+                let _ = completions.first!(nil, Errors.networkingError("Error returned."))
                 return
             }
             
+            // status code check
             guard let status = (response as? HTTPURLResponse)?.statusCode,
                 status >= 200 && status <= 299 else {
-                let _ = completions.first!(nil, Errors.networkingError("Non-2xx status code returned"))
+                let _ = completions.first!(nil, Errors.networkingError("Bad network status code returned."))
                 return
             }
             
+            // data returned check
             guard let data = data else {
-                let _ = completions.first!(nil, Errors.networkingError("No data returned"))
+                let _ = completions.first!(nil, Errors.networkingError("No data returned."))
                 return
             }
             
+            // convert data to json
             let jsonData: [String: AnyObject]!
             do {
                 jsonData = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String: AnyObject]
@@ -130,26 +177,32 @@ extension TMDBApi {
                 let _ = completions.first!(nil, Errors.networkingError("Unable to convert returned data to usable format."))
                 return
             }
-            
+
+            // create newCompletions, pull last completion for execution
             var newCompletions = completions
             let completion = newCompletions.removeLast()
+            
+            // if last completion, just execute it
             if newCompletions.isEmpty {
                 let _ = completion(jsonData, nil)
             }
             else {
              
+                // not last completion. Invoke completion to retrieve new params for new task
                 if let newParams = completion(jsonData, nil) {
                     self.tmdbTask(params: newParams, completions: newCompletions)
                 }
                 else {
-                    let _ = completions.first!(nil, Errors.networkingError("Unable to complete request"))
+                    let _ = completions.first!(nil, Errors.networkingError("Unable to complete request."))
                 }
             }
         }
         
+        // start task
         task.resume()
     }
     
+    // create a url from params. Append extentions to path is non-nl
     fileprivate func urlFromParams(_ params: [String: AnyObject], pathExtentions: String? = nil) -> URL {
         
         var components = URLComponents()

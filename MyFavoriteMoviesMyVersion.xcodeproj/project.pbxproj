@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		864235DF1E99A0D1005FD8A7 /* GenresTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864235DE1E99A0D1005FD8A7 /* GenresTableViewController.swift */; };
+		864235E11E99ADA7005FD8A7 /* MoviesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864235E01E99ADA7005FD8A7 /* MoviesTableViewController.swift */; };
 		86D5CD211E97CB8400A84FEA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D5CD201E97CB8400A84FEA /* AppDelegate.swift */; };
 		86D5CD231E97CB8400A84FEA /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D5CD221E97CB8400A84FEA /* LoginViewController.swift */; };
 		86D5CD261E97CB8400A84FEA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86D5CD241E97CB8400A84FEA /* Main.storyboard */; };
@@ -35,6 +37,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		864235DE1E99A0D1005FD8A7 /* GenresTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GenresTableViewController.swift; sourceTree = "<group>"; };
+		864235E01E99ADA7005FD8A7 /* MoviesTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoviesTableViewController.swift; sourceTree = "<group>"; };
 		86D5CD1D1E97CB8400A84FEA /* MyFavoriteMoviesMyVersion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyFavoriteMoviesMyVersion.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		86D5CD201E97CB8400A84FEA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		86D5CD221E97CB8400A84FEA /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -101,6 +105,8 @@
 			children = (
 				86D5CD201E97CB8400A84FEA /* AppDelegate.swift */,
 				86D5CD221E97CB8400A84FEA /* LoginViewController.swift */,
+				864235DE1E99A0D1005FD8A7 /* GenresTableViewController.swift */,
+				864235E01E99ADA7005FD8A7 /* MoviesTableViewController.swift */,
 				86D5CD4E1E97CC5600A84FEA /* TMDBApi.swift */,
 				86D5CD241E97CB8400A84FEA /* Main.storyboard */,
 				86D5CD271E97CB8400A84FEA /* Assets.xcassets */,
@@ -264,7 +270,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				86D5CD231E97CB8400A84FEA /* LoginViewController.swift in Sources */,
+				864235DF1E99A0D1005FD8A7 /* GenresTableViewController.swift in Sources */,
 				86D5CD4F1E97CC5600A84FEA /* TMDBApi.swift in Sources */,
+				864235E11E99ADA7005FD8A7 /* MoviesTableViewController.swift in Sources */,
 				86D5CD211E97CB8400A84FEA /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -512,6 +520,7 @@
 				86D5CD471E97CB8400A84FEA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		86D5CD481E97CB8400A84FEA /* Build configuration list for PBXNativeTarget "MyFavoriteMoviesMyVersionTests" */ = {
 			isa = XCConfigurationList;
@@ -520,6 +529,7 @@
 				86D5CD4A1E97CB8400A84FEA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		86D5CD4B1E97CB8400A84FEA /* Build configuration list for PBXNativeTarget "MyFavoriteMoviesMyVersionUITests" */ = {
 			isa = XCConfigurationList;
@@ -528,6 +538,7 @@
 				86D5CD4D1E97CB8400A84FEA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

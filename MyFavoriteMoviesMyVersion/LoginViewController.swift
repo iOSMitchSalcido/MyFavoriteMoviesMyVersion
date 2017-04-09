@@ -30,7 +30,7 @@ class LoginViewController: UIViewController {
     @IBAction func loginButtonPressed(_ sender: UIButton) {
         
         let completion = {(params: [String: AnyObject]?, error: TMDBApi.Errors?) -> [String: AnyObject]? in
-            
+
             if let error = error {
                 switch error {
                 case .networkingError(let value):
@@ -41,7 +41,15 @@ class LoginViewController: UIViewController {
                 let appDelegate = UIApplication.shared.delegate as! AppDelegate
                 appDelegate.userID = userID
                 
-                print("Success !!! userID: \(userID)")
+                let controller = self.storyboard?.instantiateViewController(withIdentifier: "GenresTableViewController") as! GenresTableViewController
+                let nc = UINavigationController(rootViewController: controller)
+                
+                DispatchQueue.main.async {
+                    self.loginButton.isEnabled = true
+                    self.present(nc, animated: true, completion: nil)
+                }
+                
+                return nil
             }
             
             DispatchQueue.main.async {
