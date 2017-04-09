@@ -17,7 +17,7 @@ class GenresTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Movie Genres"
+        title = "Genres"
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -90,6 +90,10 @@ extension GenresTableViewController {
                         
                         let controller = self.storyboard?.instantiateViewController(withIdentifier: "MoviesTableViewController") as! MoviesTableViewController
                         controller.movies = results
+                        if let genreName = genre["name"] as? String {
+                            controller.title = genreName
+                        }
+                        
                         DispatchQueue.main.async {
                             self.navigationController?.pushViewController(controller, animated: true)
                         }

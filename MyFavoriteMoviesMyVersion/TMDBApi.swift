@@ -28,6 +28,7 @@ extension TMDBApi {
         2. validate token: /authentication/token/validate_with_login
         3. generate sessionID: /authentication/session/new
         4. retrieve userID: /account
+        5. retrieve TMDB config info
         */
         
         let validateTokenCompletion = {(params: [String: AnyObject]?, error: Errors?) -> [String: AnyObject]? in
@@ -80,7 +81,23 @@ extension TMDBApi {
             return newParams as [String : AnyObject]
         }
         
+        let retrieveConfigCompletion = {(params: [String: AnyObject]?, error: Errors?) -> [String: AnyObject]? in
+            
+            guard let userID = params?[TMDBParameterKeys.userID] as? Int else {
+                    return nil
+            }
+            
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.userID = userID
+            
+            let newParams = [TMDBParameterKeys.api: TMDBParameterValues.api,
+                             "pathExtensions": "/configuration"]
+            
+            return newParams as [String : AnyObject]
+        }
+        
         let completions = [completion,
+                           retrieveConfigCompletion,
                            retrieveUserIdCompletion,
                            generateSessionIdCompletion,
                            validateTokenCompletion]

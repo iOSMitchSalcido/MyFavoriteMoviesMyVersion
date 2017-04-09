@@ -10,6 +10,7 @@ import UIKit
 
 class LoginViewController: UIViewController {
 
+    // 
     let api = TMDBApi()
     
     @IBOutlet weak var usernameTextField: UITextField!
@@ -18,32 +19,32 @@ class LoginViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
 
     @IBAction func loginButtonPressed(_ sender: UIButton) {
         
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+
         let completion = {(params: [String: AnyObject]?, error: TMDBApi.Errors?) -> [String: AnyObject]? in
 
+            // error test
             if let error = error {
                 switch error {
                 case .networkingError(let value):
                     print("Networking Error: \(value)")
                 }
             }
-            else if let userID = params?[TMDBApi.TMDBParameterKeys.userID] as? Int {
-                let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                appDelegate.userID = userID
+            else if appDelegate.userID != nil, let params = params {
                 
+                // if success retrieving useID, then last params passed in are TMDB Config dictionary
+                // ..set in appDelegate
+                appDelegate.config = params
+                
+                // invoke Genres tvc
                 let controller = self.storyboard?.instantiateViewController(withIdentifier: "GenresTableViewController") as! GenresTableViewController
                 let nc = UINavigationController(rootViewController: controller)
                 
+                // re-enable login button..push Genres tvc
                 DispatchQueue.main.async {
                     self.loginButton.isEnabled = true
                     self.present(nc, animated: true, completion: nil)
