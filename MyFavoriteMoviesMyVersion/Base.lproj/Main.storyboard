@@ -138,33 +138,42 @@
             </objects>
             <point key="canvasLocation" x="1250" y="-379"/>
         </scene>
-        <!--Table View Controller-->
-        <scene sceneID="6Sj-De-bjb">
+        <!--Movies Table View Controller-->
+        <scene sceneID="61z-SI-9TP">
             <objects>
-                <tableViewController id="wic-DH-XCl" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="XhX-y5-uwO">
+                <tableViewController storyboardIdentifier="MoviesTableViewController" id="hK1-gu-BUL" customClass="MoviesTableViewController" customModule="MyFavoriteMoviesMyVersion" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="AaR-QC-tJk">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="nWy-cC-Jsm">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="MovieCellID" textLabel="M3P-YN-1QU" style="IBUITableViewCellStyleDefault" id="h8C-5W-14k">
                                 <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nWy-cC-Jsm" id="X4m-LF-MkT">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="h8C-5W-14k" id="aD8-79-Ttn">
+                                    <rect key="frame" x="0.0" y="0.0" width="342" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="M3P-YN-1QU">
+                                            <rect key="frame" x="15" y="0.0" width="325" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
                                 </tableViewCellContentView>
                             </tableViewCell>
                         </prototypes>
                         <connections>
-                            <outlet property="dataSource" destination="wic-DH-XCl" id="8Um-j5-Jhy"/>
-                            <outlet property="delegate" destination="wic-DH-XCl" id="REP-nR-q8U"/>
+                            <outlet property="dataSource" destination="hK1-gu-BUL" id="q7C-8i-gIg"/>
+                            <outlet property="delegate" destination="hK1-gu-BUL" id="bhq-cD-eCL"/>
                         </connections>
                     </tableView>
                 </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="POs-RY-CEb" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Gbl-pq-NQL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2109" y="-394"/>
+            <point key="canvasLocation" x="2127" y="-379"/>
         </scene>
     </scenes>
 </document>

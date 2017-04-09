@@ -104,7 +104,9 @@ extension TMDBApi {
     func moviesByGenreID(_ id: Int, completion: @escaping ([String: AnyObject]?, Errors?) -> [String: AnyObject]?) {
         
         let params = [TMDBParameterKeys.api: TMDBParameterValues.api,
-                      "pathExtensions": "/genre/\(id)/list"]
+                      "sort_by": "created_at.asc",
+                      "pathExtensions": "/genre/\(id)/movies"]
+        
         tmdbTask(params: params as [String : AnyObject], completions: [completion])
     }
     
@@ -136,7 +138,8 @@ extension TMDBApi {
         let requestBody = newParams.removeValue(forKey: TMDBParameterKeys.requestBody)
         
         // create URLRequest. Test if body present
-        var request = URLRequest(url: urlFromParams(params, pathExtentions: pathExtensions))
+        var request = URLRequest(url: urlFromParams(newParams, pathExtentions: pathExtensions))
+
         if let requestBody = requestBody {
             request.httpMethod = "POST"
             print(requestBody)
@@ -209,12 +212,12 @@ extension TMDBApi {
         components.scheme = TMDB.scheme
         components.host = TMDB.host
         components.path = TMDB.path + (pathExtentions ?? "")
+        components.queryItems = [URLQueryItem]()
         
-        var queryItems = [URLQueryItem]()
         for (key, value) in params {
-            queryItems.append(URLQueryItem(name: key, value: "\(value)"))
+            let queryItem = URLQueryItem(name: key, value: "\(value)")
+            components.queryItems!.append(queryItem)
         }
-        components.queryItems = queryItems
 
         return components.url!
     }
