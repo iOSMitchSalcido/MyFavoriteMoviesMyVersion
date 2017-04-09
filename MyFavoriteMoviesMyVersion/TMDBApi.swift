@@ -5,6 +5,11 @@
 //  Created by Online Training on 4/7/17.
 //  Copyright © 2017 Mitch Salcido. All rights reserved.
 //
+/*
+ About TMDBApi.swift:
+ Interface for TMDB API. Provides functionality for interacting with TMDB, including: login, pulling movies,
+ favoriting/unfavoriting movies, and includes constants used throughout app
+*/
 
 import Foundation
 import UIKit
@@ -24,23 +29,33 @@ extension TMDBApi {
     func loginWithUserName(_ userName: String, password: String, completion: @escaping ([String: AnyObject]?, Errors?) -> [String: AnyObject]?) {
         
         /*
-        1. get token: /authentication/token/new
-        2. validate token: /authentication/token/validate_with_login
-        3. generate sessionID: /authentication/session/new
-        4. retrieve userID: /account
-        5. retrieve TMDB config info
+         Login is perform by passing an array of closures to function tbdmTask, which iterates thru array of closures
+         to perform login. dataTask will provide JSON data for closures, which will return params for next dataTask.
+        1) get token: /authentication/token/new
+        2) validate token: /authentication/token/validate_with_login
+        3) generate sessionID: /authentication/session/new
+        4) retrieve userID: /account
+        5) retrieve TMDB config info
+         
+         !! (1) above is kicked off first, and not a closure operation
         */
         
+        // create closures
+        
+        // 2) validate token: /authentication/token/validate_with_login
         let validateTokenCompletion = {(params: [String: AnyObject]?, error: Errors?) -> [String: AnyObject]? in
             
+            // test success, token
             guard let success = params?[TMDBParameterKeys.success] as? Bool, success == true,
                 let token = params?[TMDBParameterKeys.token] as? String else {
                     return nil
             }
             
+            // save token in appDelegate singleton
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             appDelegate.token = token
             
+            // new params for next task
             let newParams = [TMDBParameterKeys.api: TMDBParameterValues.api,
                              TMDBParameterKeys.username: userName,
                              TMDBParameterKeys.password: password,
@@ -50,13 +65,16 @@ extension TMDBApi {
             return newParams as [String : AnyObject]
         }
         
+        // 3) generate sessionID: /authentication/session/new
         let generateSessionIdCompletion = {(params: [String: AnyObject]?, error: Errors?) -> [String: AnyObject]? in
             
+            // test success, token
             guard let success = params?[TMDBParameterKeys.success] as? Bool, success == true,
                 let token = params?[TMDBParameterKeys.token] as? String else {
                     return nil
             }
             
+            // new params for next task
             let newParams = [TMDBParameterKeys.api: TMDBParameterValues.api,
                              TMDBParameterKeys.token: token,
                              "pathExtensions": "/authentication/session/new"]
@@ -64,16 +82,20 @@ extension TMDBApi {
             return newParams as [String : AnyObject]
         }
         
+        // 4) retrieve userID: /account
         let retrieveUserIdCompletion = {(params: [String: AnyObject]?, error: Errors?) -> [String: AnyObject]? in
             
+            // test success, sessionID
             guard let success = params?[TMDBParameterKeys.success] as? Bool, success == true,
                 let sessionID = params?[TMDBParameterKeys.sessionID] as? String else {
                     return nil
             }
             
+            // save sessionID in appDelegate singleton
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             appDelegate.sessionID = sessionID
             
+            // new params for next task
             let newParams = [TMDBParameterKeys.api: TMDBParameterValues.api,
                              TMDBParameterKeys.sessionID: sessionID,
                              "pathExtensions": "/account"]
@@ -81,30 +103,37 @@ extension TMDBApi {
             return newParams as [String : AnyObject]
         }
         
+        // 5) retrieve TMDB config info
         let retrieveConfigCompletion = {(params: [String: AnyObject]?, error: Errors?) -> [String: AnyObject]? in
             
+            // test userID
             guard let userID = params?[TMDBParameterKeys.userID] as? Int else {
                     return nil
             }
             
+            // save userID in appDelegate singleton
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             appDelegate.userID = userID
             
+            // new params for next task
             let newParams = [TMDBParameterKeys.api: TMDBParameterValues.api,
                              "pathExtensions": "/configuration"]
             
             return newParams as [String : AnyObject]
         }
         
+        // create closure array
         let completions = [completion,
                            retrieveConfigCompletion,
                            retrieveUserIdCompletion,
                            generateSessionIdCompletion,
                            validateTokenCompletion]
         
+        // params for first operation
         let params = [TMDBParameterKeys.api: TMDBParameterValues.api,
                       "pathExtensions": "/authentication/token/new"]
         
+        // run task
         tmdbTask(params: params as [String : AnyObject], completions: completions)
     }
 }
@@ -135,7 +164,7 @@ extension TMDBApi {
     fileprivate func tmdbTask(params: [String: AnyObject], completions: [([String: AnyObject]?, Errors?) -> [String: AnyObject]?]) {
 
         /*
-         This function creates and runs a data task. Function takes params and sifts out key/values to create a 
+         This function creates and runs a data task. Func takes params and sifts out key/values to create a
          valid URL. Within params, keys "pathExtensions" and requestBody can be included. pathExtensions are needed
          to append path in url creation. requestBody is required for creating post methods to API
          
@@ -146,7 +175,10 @@ extension TMDBApi {
          block at 0 for UI update, etc.
          
          Each block in array is intended to be passed the recovered JSON data, and return a dictionary
-         for use as a params in a new tmdbTask call. The last completion in array is removed and then executed
+         for use as a params in a new tmdbTask call. The last completion in array is removed and then executed.
+         
+         During error checking, is problem found then completion at index 0 is executed with a non-nil Errors passed
+         in.
         */
         
         // create params, pull out pathExtensions and request body
@@ -200,21 +232,13 @@ extension TMDBApi {
 
             // create newCompletions, pull last completion for execution
             var newCompletions = completions
-            let completion = newCompletions.removeLast()
-            
-            // if last completion, just execute it
-            if newCompletions.isEmpty {
-                let _ = completion(jsonData, nil)
+            let lastCompletion = newCompletions.removeLast()
+            if let newParams = lastCompletion(jsonData, nil) {
+                self.tmdbTask(params: newParams, completions: newCompletions)
             }
-            else {
-             
-                // not last completion. Invoke completion to retrieve new params for new task
-                if let newParams = completion(jsonData, nil) {
-                    self.tmdbTask(params: newParams, completions: newCompletions)
-                }
-                else {
-                    let _ = completions.first!(nil, Errors.networkingError("Unable to complete request."))
-                }
+            else if !newCompletions.isEmpty {
+                // still more completions, but nil params....error
+                let _ = completions.first!(nil, Errors.networkingError("Unknown error."))
             }
         }
         
@@ -222,7 +246,7 @@ extension TMDBApi {
         task.resume()
     }
     
-    // create a url from params. Append extentions to path is non-nl
+    // create a url from params. Append extentions to path if non-nl
     fileprivate func urlFromParams(_ params: [String: AnyObject], pathExtentions: String? = nil) -> URL {
         
         var components = URLComponents()
