@@ -20,6 +20,9 @@ struct TMDBApi {
     enum Errors: Swift.Error {
         case networkingError(String)
     }
+    
+    // appDelegate
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
 }
 
 // login
@@ -51,16 +54,15 @@ extension TMDBApi {
                     return nil
             }
             
-            // save token in appDelegate singleton
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            appDelegate.token = token
+            // save token in appDelegate
+            self.appDelegate.token = token
             
             // new params for next task
             let newParams = [TMDBParameterKeys.api: TMDBParameterValues.api,
                              TMDBParameterKeys.username: userName,
                              TMDBParameterKeys.password: password,
                              TMDBParameterKeys.token: token,
-                             "pathExtensions": "/authentication/token/validate_with_login"]
+                             TMDBParameterKeys.pathExtensions: "/authentication/token/validate_with_login"]
             
             return newParams as [String : AnyObject]
         }
@@ -77,7 +79,7 @@ extension TMDBApi {
             // new params for next task
             let newParams = [TMDBParameterKeys.api: TMDBParameterValues.api,
                              TMDBParameterKeys.token: token,
-                             "pathExtensions": "/authentication/session/new"]
+                             TMDBParameterKeys.pathExtensions: "/authentication/session/new"]
             
             return newParams as [String : AnyObject]
         }
@@ -91,14 +93,13 @@ extension TMDBApi {
                     return nil
             }
             
-            // save sessionID in appDelegate singleton
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            appDelegate.sessionID = sessionID
+            // save sessionID in appDelegate
+            self.appDelegate.sessionID = sessionID
             
             // new params for next task
             let newParams = [TMDBParameterKeys.api: TMDBParameterValues.api,
                              TMDBParameterKeys.sessionID: sessionID,
-                             "pathExtensions": "/account"]
+                             TMDBParameterKeys.pathExtensions: "/account"]
             
             return newParams as [String : AnyObject]
         }
@@ -111,13 +112,12 @@ extension TMDBApi {
                     return nil
             }
             
-            // save userID in appDelegate singleton
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            appDelegate.userID = userID
+            // save userID in appDelegate
+            self.appDelegate.userID = userID
             
             // new params for next task
             let newParams = [TMDBParameterKeys.api: TMDBParameterValues.api,
-                             "pathExtensions": "/configuration"]
+                             TMDBParameterKeys.pathExtensions: "/configuration"]
             
             return newParams as [String : AnyObject]
         }
@@ -131,35 +131,36 @@ extension TMDBApi {
         
         // params for first operation
         let params = [TMDBParameterKeys.api: TMDBParameterValues.api,
-                      "pathExtensions": "/authentication/token/new"]
+                      TMDBParameterKeys.pathExtensions: "/authentication/token/new"]
         
         // run task
         tmdbTask(params: params as [String : AnyObject], completions: completions)
     }
 }
 
+// functions for accessing movie fun stuff
 extension TMDBApi {
     
+    // retrieve list of movie genres
     func movieGenres(completion: @escaping ([String: AnyObject]?, Errors?) -> [String: AnyObject]?) {
         
         let params = [TMDBParameterKeys.api: TMDBParameterValues.api,
-                      "pathExtensions": "/genre/movie/list"]
+                      TMDBParameterKeys.pathExtensions: "/genre/movie/list"]
         tmdbTask(params: params as [String : AnyObject], completions: [completion])
     }
     
+    // retrieve list of movies by genre
     func moviesByGenreID(_ id: Int, completion: @escaping ([String: AnyObject]?, Errors?) -> [String: AnyObject]?) {
         
         let params = [TMDBParameterKeys.api: TMDBParameterValues.api,
                       "sort_by": "created_at.asc",
-                      "pathExtensions": "/genre/\(id)/movies"]
+                      TMDBParameterKeys.pathExtensions: "/genre/\(id)/movies"]
         
         tmdbTask(params: params as [String : AnyObject], completions: [completion])
     }
     
+    // retrieve favorite movies...movies that have been "favorited"
     func favoriteMovies(completion: @escaping ([String: AnyObject]?, Errors?) -> [String: AnyObject]?) {
-        
-        // appDelegate singleton
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
         // test for valid sessionID and userID
         if let sessionID = appDelegate.sessionID, let userID = appDelegate.userID {
@@ -167,7 +168,7 @@ extension TMDBApi {
             // good ID's...proceed
             let params = [TMDBParameterKeys.api: TMDBParameterValues.api,
                           TMDBParameterKeys.sessionID: sessionID,
-                          "pathExtensions": "/account/\(userID)/favorite/movies"]
+                          TMDBParameterKeys.pathExtensions: "/account/\(userID)/favorite/movies"]
             
             tmdbTask(params: params as [String : AnyObject], completions: [completion])
         }
@@ -177,10 +178,8 @@ extension TMDBApi {
         }
     }
     
+    // mark a movies favorite state
     func markMovieAsFavorite(movieID: Int, favorite: Bool, completion: @escaping ([String: AnyObject]?, Errors?) -> [String: AnyObject]?) {
-        
-        // appDelegate singleton
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
         // test for valid sessionID and userID
         if let sessionID = appDelegate.sessionID, let userID = appDelegate.userID {
@@ -194,7 +193,7 @@ extension TMDBApi {
             let params: [String: AnyObject] = [TMDBParameterKeys.api: TMDBParameterValues.api as AnyObject,
                                                TMDBParameterKeys.sessionID: sessionID as AnyObject,
                                                TMDBParameterKeys.requestBody: requestBody as AnyObject,
-                                               "pathExtensions": "/account/\(userID)/favorite" as AnyObject]
+                                               TMDBParameterKeys.pathExtensions: "/account/\(userID)/favorite" as AnyObject]
             
             tmdbTask(params: params as [String : AnyObject], completions: [completion])
         }
@@ -230,7 +229,7 @@ extension TMDBApi {
         
         // create params, pull out pathExtensions and request body
         var newParams = params
-        let pathExtensions = newParams.removeValue(forKey: "pathExtensions") as? String
+        let pathExtensions = newParams.removeValue(forKey: TMDBParameterKeys.pathExtensions) as? String
         let requestBody = newParams.removeValue(forKey: TMDBParameterKeys.requestBody)
         
         // create URLRequest. Test if body present
@@ -240,8 +239,15 @@ extension TMDBApi {
             request.httpMethod = "POST"
             let headers = ["content-type": "application/json;charset=utf-8"]
             request.allHTTPHeaderFields = headers
-            let postData = try! JSONSerialization.data(withJSONObject: requestBody)
-            request.httpBody = postData
+            
+            do {
+                let postData = try JSONSerialization.data(withJSONObject: requestBody)
+                request.httpBody = postData
+            }
+            catch {
+                let _ = completions.first!(nil, Errors.networkingError("URL request problem"))
+                return
+            }
         }
         else {
             request.httpMethod = "GET"
@@ -333,6 +339,7 @@ extension TMDBApi {
         fileprivate static let token = "request_token"
         fileprivate static let success = "success"
         fileprivate static let sessionID = "session_id"
+        fileprivate static let pathExtensions = "pathExtensions"
         static let userID = "id"
     }
     
