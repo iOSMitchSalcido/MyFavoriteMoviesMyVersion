@@ -24,7 +24,7 @@ class MovieViewController: UIViewController {
     var movie: [String:AnyObject]!
     
     // ref to delegate
-    var appDelegate: AppDelegate!
+    var appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     // bbi's for favoriting/unfavoriting a movie
     var unfavBbi: UIBarButtonItem!
@@ -38,9 +38,6 @@ class MovieViewController: UIViewController {
 
         // title
         title = "Info"
-        
-        // appDelegate
-        appDelegate = UIApplication.shared.delegate as! AppDelegate
         
         // unfav bbi
         unfavBbi = UIBarButtonItem(barButtonSystemItem: .stop,

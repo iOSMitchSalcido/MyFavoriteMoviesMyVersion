@@ -15,7 +15,7 @@ import UIKit
 class MoviesTableViewController: UITableViewController {
 
     // app delegaete
-    var appDelegate: AppDelegate!
+    var appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     // store for movies
     var movies = [[String:AnyObject]]()
@@ -31,9 +31,6 @@ class MoviesTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // get appDelegate
-        appDelegate = UIApplication.shared.delegate as! AppDelegate
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -133,7 +130,7 @@ extension MoviesTableViewController {
                     
                     let request = URLRequest(url: url)
                     let task = URLSession.shared.dataTask(with: request) {
-                        (data, response, error) in
+                        (data, _, _) in
                         
                         // get image...set in buffer
                         if let imageData = data, let image = UIImage(data: imageData) {
