@@ -23,7 +23,7 @@ class MoviesTableViewController: UITableViewController {
     // buffer to store movie poster image thumbnails
     var thumbnailImageBuffer = [String: UIImage]()
     
-    // set in calling VC..nil is favorites
+    // set in calling VC.movies are loaded by genre..nil is favorites
     var genreID: Int?
     
     // ref to api
@@ -66,12 +66,11 @@ class MoviesTableViewController: UITableViewController {
             return nil
         }
         
+        // test for genre or favorites
         if let id = genreID {
-            print("getting movies by genre")
             api.moviesByGenreID(id, completion: completion)
         }
         else {
-            print("getting favorite movies")
             api.favoriteMovies(completion: completion)
         }
     }
@@ -160,6 +159,7 @@ extension MoviesTableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
+        // show movie detail
         let movie = movies[indexPath.row]
         let controller = storyboard?.instantiateViewController(withIdentifier: "MovieViewController") as! MovieViewController
         controller.movie = movie
