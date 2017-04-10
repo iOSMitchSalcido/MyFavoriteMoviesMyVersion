@@ -17,11 +17,17 @@ class MoviesTableViewController: UITableViewController {
     // app delegaete
     var appDelegate: AppDelegate!
     
-    // set in calling VC
-    var movies:[[String:AnyObject]]!
+    // store for movies
+    var movies = [[String:AnyObject]]()
     
     // buffer to store movie poster image thumbnails
     var thumbnailImageBuffer = [String: UIImage]()
+    
+    // set in calling VC..nil is favorites
+    var genreID: Int?
+    
+    // ref to api
+    let api = TMDBApi()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,8 +39,39 @@ class MoviesTableViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        // reload
-        tableView.reloadData()
+        // completion for retrieving movies by genre
+        let completion = {(params: [String: AnyObject]?, error: TMDBApi.Errors?) -> [String: AnyObject]? in
+            
+            // test error
+            if let error = error {
+                switch error {
+                case .networkingError(let value):
+                    print("Networking Error: \(value)")
+                }
+            }
+            else {
+                // get params, test for results..movies in genre
+                if let params = params, let results = params["results"] as? [[String:AnyObject]] {
+                    
+                    // set movies
+                    self.movies = results
+                    
+                    // reload data
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                }
+            }
+            
+            return nil
+        }
+        
+        if let id = genreID {
+            api.moviesByGenreID(id, completion: completion)
+        }
+        else {
+            api.favoriteMovies(completion: completion)
+        }
     }
     
     // helper function. Return a URL for a movie poster path for use in cell imageView

@@ -96,45 +96,11 @@ extension GenresTableViewController {
         let genre = genres[indexPath.row]
         if let id = genre["id"] as? Int {
             
-            // completion for retrieving movies by genre
-            let completion = {(params: [String: AnyObject]?, error: TMDBApi.Errors?) -> [String: AnyObject]? in
-                
-                // test error
-                if let error = error {
-                    switch error {
-                    case .networkingError(let value):
-                        print("Networking Error: \(value)")
-                    }
-                }
-                else {
-                    // get params, test for results..movies in genre
-                    if let params = params, let results = params["results"] as? [[String:AnyObject]] {
-                        
-                        // good results..invoke MoviesTVC, populate with results
-                        let controller = self.storyboard?.instantiateViewController(withIdentifier: "MoviesTableViewController") as! MoviesTableViewController
-                        controller.movies = results
-                        if let genreName = genre["name"] as? String {
-                            // VC title is genre name
-                            controller.title = genreName
-                        }
-                        
-                        // push
-                        DispatchQueue.main.async {
-                            self.navigationController?.pushViewController(controller, animated: true)
-                        }
-                    }
-                }
-                
-                return nil
+            let controller = self.storyboard?.instantiateViewController(withIdentifier: "MoviesTableViewController") as! MoviesTableViewController
+            if indexPath.row != 0 {
+                controller.genreID = id
             }
-            
-            // invoke api call..test for favorites
-            if indexPath.row == 0 {
-                api.favoriteMovies(completion: completion)
-            }
-            else {
-                api.moviesByGenreID(id, completion: completion)
-            }
+            self.navigationController?.pushViewController(controller, animated: true)
         }
     }
 }
