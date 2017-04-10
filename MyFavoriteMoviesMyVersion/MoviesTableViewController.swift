@@ -67,9 +67,11 @@ class MoviesTableViewController: UITableViewController {
         }
         
         if let id = genreID {
+            print("getting movies by genre")
             api.moviesByGenreID(id, completion: completion)
         }
         else {
+            print("getting favorite movies")
             api.favoriteMovies(completion: completion)
         }
     }
