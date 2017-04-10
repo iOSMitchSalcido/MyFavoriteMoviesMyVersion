@@ -158,7 +158,7 @@ extension TMDBApi {
     
     func favoriteMovies(completion: @escaping ([String: AnyObject]?, Errors?) -> [String: AnyObject]?) {
         
-        // save token in appDelegate singleton
+        // appDelegate singleton
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
         // test for valid sessionID and userID
@@ -168,6 +168,33 @@ extension TMDBApi {
             let params = [TMDBParameterKeys.api: TMDBParameterValues.api,
                           TMDBParameterKeys.sessionID: sessionID,
                           "pathExtensions": "/account/\(userID)/favorite/movies"]
+            
+            tmdbTask(params: params as [String : AnyObject], completions: [completion])
+        }
+        else {
+            // bad ID's fire completion with error message
+            let _ = completion(nil, Errors.networkingError("Not currently log'd in to TMDB"))
+        }
+    }
+    
+    func markMovieAsFavorite(movieID: Int, favorite: Bool, completion: @escaping ([String: AnyObject]?, Errors?) -> [String: AnyObject]?) {
+        
+        // appDelegate singleton
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        // test for valid sessionID and userID
+        if let sessionID = appDelegate.sessionID, let userID = appDelegate.userID {
+            
+            // request body
+            let requestBody: [ String: AnyObject] = ["media_type": "movie" as AnyObject,
+                                                     "media_id": movieID as AnyObject,
+                                                     "favorite": favorite as AnyObject]
+            
+            // good ID's...proceed
+            let params: [String: AnyObject] = [TMDBParameterKeys.api: TMDBParameterValues.api as AnyObject,
+                                               TMDBParameterKeys.sessionID: sessionID as AnyObject,
+                                               TMDBParameterKeys.requestBody: requestBody as AnyObject,
+                                               "pathExtensions": "/account/\(userID)/favorite" as AnyObject]
             
             tmdbTask(params: params as [String : AnyObject], completions: [completion])
         }
@@ -211,7 +238,10 @@ extension TMDBApi {
 
         if let requestBody = requestBody {
             request.httpMethod = "POST"
-            print(requestBody)
+            let headers = ["content-type": "application/json;charset=utf-8"]
+            request.allHTTPHeaderFields = headers
+            let postData = try! JSONSerialization.data(withJSONObject: requestBody)
+            request.httpBody = postData
         }
         else {
             request.httpMethod = "GET"
