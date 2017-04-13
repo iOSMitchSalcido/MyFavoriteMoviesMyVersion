@@ -285,16 +285,10 @@ extension TMDBApi {
                 let _ = completions.first!(nil, Errors.networkingError("Unable to convert returned data to usable format."))
                 return
             }
-
-            // create newCompletions, pull last completion for execution
-            var newCompletions = completions
-            let lastCompletion = newCompletions.removeLast()
-            if let newParams = lastCompletion(jsonData, nil) {
-                self.tmdbTask(params: newParams, completions: newCompletions)
-            }
-            else if !newCompletions.isEmpty {
-                // still more completions, but nil params....error
-                let _ = completions.first!(nil, Errors.networkingError("Unknown error."))
+            
+            var completions = completions
+            if let params = (completions.removeLast())(jsonData, nil) {
+                self.tmdbTask(params: params, completions: completions)
             }
         }
         
