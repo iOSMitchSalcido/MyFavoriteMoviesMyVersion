@@ -339,6 +339,6 @@ extension TMDBApi {
     
     // constants for TMDB api paramater values
     struct TMDBParameterValues {
-        fileprivate static let api = "aadfd5df8a93f2adb470ffac7193bad9"
+        fileprivate static let api = "e1e8307ad4cd932629ea3e3504541260"
     }
 }
